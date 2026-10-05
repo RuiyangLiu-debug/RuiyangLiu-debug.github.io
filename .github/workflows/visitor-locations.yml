@@ -46,7 +46,11 @@ jobs:
                   with urllib.request.urlopen(req, timeout=30) as r:
                       page = json.load(r)
               except urllib.error.HTTPError as e:
-                  fail(f"GoatCounter API returned HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:300]}")
+                  body = e.read().decode("utf-8", "replace")[:300]
+                  if e.code == 404 and "not found" in body and offset == 0:
+                      print("::notice title=Visitor locations::No visitor data in GoatCounter yet; nothing to update.")
+                      sys.exit(0)
+                  fail(f"GoatCounter API returned HTTP {e.code}: {body}")
               except Exception as e:
                   fail(f"Could not reach the GoatCounter API: {e}")
               batch = page.get("stats") or []
