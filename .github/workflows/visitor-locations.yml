@@ -1,0 +1,86 @@
+name: Update visitor locations
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: visitor-locations
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch countries from GoatCounter
+        env:
+          GOATCOUNTER_API_KEY: ${{ secrets.GOATCOUNTER_API_KEY }}
+          GOATCOUNTER_CODE: ruiyangliu
+          SINCE: "2026-10-01T00:00:00Z"
+        run: |
+          python3 - <<'PY'
+          import datetime, json, os, re, sys, urllib.request
+
+          key = os.environ.get("GOATCOUNTER_API_KEY", "")
+          if not key:
+              sys.exit("GOATCOUNTER_API_KEY secret is not set")
+          base = os.environ.get("GOATCOUNTER_API", f"https://{os.environ['GOATCOUNTER_CODE']}.goatcounter.com")
+
+          stats, offset = [], 0
+          while True:
+              url = f"{base}/api/v0/stats/locations?start={os.environ['SINCE']}&limit=100&offset={offset}"
+              req = urllib.request.Request(url, headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  page = json.load(r)
+              batch = page.get("stats") or []
+              stats += batch
+              if not page.get("more") or not batch:
+                  break
+              offset += len(batch)
+
+          items, others = [], 0
+          for s in stats:
+              code, name, count = (s.get("id") or "").strip(), (s.get("name") or "").strip(), int(s.get("count") or 0)
+              if count <= 0:
+                  continue
+              if not re.fullmatch(r"[A-Za-z]{2}", code) or not name or name.startswith("("):
+                  others += count
+              else:
+                  items.append({"code": code.upper(), "name": name, "count": count})
+          items.sort(key=lambda x: -x["count"])
+
+          path = "data/visitor-locations.js"
+          old = open(path, encoding="utf-8").read() if os.path.exists(path) else ""
+          m = re.search(r"=\s*(\{.*\})\s*;?\s*$", old, re.S)
+          try:
+              prev = json.loads(m.group(1)) if m else {}
+          except ValueError:
+              prev = {}
+          if prev.get("items") == items and prev.get("others") == others and prev.get("sample") is False:
+              print("No change.")
+              sys.exit(0)
+
+          data = {"sample": False, "updated": datetime.date.today().isoformat(), "items": items, "others": others}
+          os.makedirs("data", exist_ok=True)
+          with open(path, "w", encoding="utf-8") as f:
+              f.write("window.VISITOR_LOCATIONS = " + json.dumps(data, ensure_ascii=False) + ";\n")
+          print(f"Updated: {len(items)} countries, {others} other")
+          PY
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- data/visitor-locations.js; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/visitor-locations.js
+          git commit -m "Update visitor locations"
+          git push
