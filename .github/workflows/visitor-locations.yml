@@ -27,17 +27,28 @@ jobs:
           python3 - <<'PY'
           import datetime, json, os, re, sys, urllib.request
 
-          key = os.environ.get("GOATCOUNTER_API_KEY", "")
+          import urllib.error
+
+          def fail(msg):
+              print(f"::error title=Visitor locations::{msg}")
+              sys.exit(1)
+
+          key = os.environ.get("GOATCOUNTER_API_KEY", "").strip()
           if not key:
-              sys.exit("GOATCOUNTER_API_KEY secret is not set")
+              fail("The GOATCOUNTER_API_KEY secret is empty or missing. Check Settings > Secrets and variables > Actions.")
           base = os.environ.get("GOATCOUNTER_API", f"https://{os.environ['GOATCOUNTER_CODE']}.goatcounter.com")
 
           stats, offset = [], 0
           while True:
               url = f"{base}/api/v0/stats/locations?start={os.environ['SINCE']}&limit=100&offset={offset}"
               req = urllib.request.Request(url, headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
-              with urllib.request.urlopen(req, timeout=30) as r:
-                  page = json.load(r)
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      page = json.load(r)
+              except urllib.error.HTTPError as e:
+                  fail(f"GoatCounter API returned HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:300]}")
+              except Exception as e:
+                  fail(f"Could not reach the GoatCounter API: {e}")
               batch = page.get("stats") or []
               stats += batch
               if not page.get("more") or not batch:
