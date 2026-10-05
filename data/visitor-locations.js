@@ -1,1 +1,1 @@
-window.VISITOR_LOCATIONS = { sample: false, updated: null, items: [], others: 0 };
+window.VISITOR_LOCATIONS = {"sample": false, "updated": "2026-10-05", "items": [{"code": "SG", "name": "Singapore", "count": 3}, {"code": "CA", "name": "Canada", "count": 1}, {"code": "DK", "name": "Denmark", "count": 1}, {"code": "IM", "name": "Isle of Man", "count": 1}, {"code": "NL", "name": "Netherlands", "count": 1}], "others": 0};
