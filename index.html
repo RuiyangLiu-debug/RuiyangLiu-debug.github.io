@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Ruiyang Liu · HomePage</title>
+  <meta name="description" content="Ruiyang Liu — aerial manipulation, whole-body motion planning, and multi-UAV navigation at Nanyang Technological University.">
+  <meta name="keywords" content="Ruiyang Liu, 刘瑞洋, Robotics, Aerial Manipulation, QuadHand, NTU">
+  <meta name="author" content="Ruiyang Liu">
+  <!-- 浅色/深色模式：手动切换过就用记住的选择，否则跟随系统。放在最前面，避免打开时闪一下 -->
+  <script>
+    (function () {
+      var root = document.documentElement;
+      root.classList.add('js');
+      var savedTheme = null;
+      try { savedTheme = localStorage.getItem('theme'); } catch (e) {}
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        root.setAttribute('data-theme', savedTheme);
+      }
+      var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.setAttribute('data-theme-effective', root.getAttribute('data-theme') || (systemDark ? 'dark' : 'light'));
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="data/visitor-locations.js" defer></script>
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+
+  <!-- 图标：四旋翼无人机 -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-drone" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <circle cx="5.5" cy="5.5" r="3"/><circle cx="18.5" cy="5.5" r="3"/>
+        <circle cx="5.5" cy="18.5" r="3"/><circle cx="18.5" cy="18.5" r="3"/>
+        <path d="M7.8 7.8l2.4 2.4M16.2 7.8l-2.4 2.4M7.8 16.2l2.4-2.4M16.2 16.2l-2.4-2.4"/>
+        <rect x="9.8" y="9.8" width="4.4" height="4.4" rx="1.2" fill="currentColor"/>
+      </g>
+    </symbol>
+  </svg>
+
+  <!-- 滚动进度条 -->
+  <div class="progress" aria-hidden="true"><span></span></div>
+
+  <!-- ========== 顶部导航栏 ========== -->
+  <header class="site-nav">
+    <div class="nav-inner">
+      <a href="#research" class="brand" aria-label="Ruiyang Liu, back to top">
+        <span class="brand-mark">rl</span>
+        <span class="brand-name">Ruiyang Liu</span>
+      </a>
+      <nav class="nav-links" aria-label="Sections">
+        <a href="#research">Research</a>
+        <a href="#quadhand">QuadHand</a>
+        <a href="#publications">Publications</a>
+        <a href="#projects">Projects</a>
+        <a href="#journey">Journey</a>
+        <span class="nav-indicator" aria-hidden="true"></span>
+      </nav>
+      <div class="nav-actions">
+        <button class="icon-btn search-toggle" type="button" aria-label="Search this site (Ctrl+K)" title="Search (Ctrl+K)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+        </button>
+        <button class="icon-btn theme-toggle" type="button" aria-label="Switch to dark mode">
+          <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+        <button class="icon-btn menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+          <span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <nav id="mobile-menu" class="mobile-menu" aria-label="Sections">
+      <a href="#research">Research</a>
+      <a href="#quadhand">QuadHand</a>
+      <a href="#publications">Publications</a>
+      <a href="#projects">Projects</a>
+      <a href="#journey">Journey</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ========== 首屏：姓名 + 自我介绍 + 最近的研究 ========== -->
+    <section id="research" class="hero">
+      <div class="container hero-inner">
+
+        <div class="hero-head">
+          <!-- 名字描边动画：先用橙色线条描出名字，再填满颜色（由 js/main.js 生成） -->
+          <h1 class="hero-title"><span class="title-text">Ruiyang Liu</span></h1>
+          <!-- 标题右边：一条无人机飞行轨迹 -->
+          <svg class="hero-traj" viewBox="0 0 600 180" aria-hidden="true">
+            <path class="hero-traj-track" d="M20 150 C 120 150, 150 62, 254 68 S 392 160, 474 112 S 556 30, 588 36"/>
+            <path class="hero-traj-path" d="M20 150 C 120 150, 150 62, 254 68 S 392 160, 474 112 S 556 30, 588 36"/>
+            <circle class="hero-traj-dot" cx="20" cy="150" r="4"/>
+            <circle class="hero-traj-dot is-end" cx="588" cy="36" r="5"/>
+            <g class="hero-drone"><g class="hero-drone-bob"><use href="#i-drone" x="-14" y="-14" width="28" height="28"/></g></g>
+          </svg>
+        </div>
+
+        <!-- 自我介绍：左边照片，右边简介 -->
+        <div class="intro">
+          <div class="intro-photo" data-reveal="wipe">
+            <!-- 把你的照片命名为 profile.jpg 放进 images/ 文件夹，这里就会自动显示 -->
+            <img src="images/profile.jpg" alt="Photo of Ruiyang Liu" onerror="this.closest('.intro-photo').classList.add('photo-missing')">
+            <div class="photo-placeholder" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+              <span>images/profile.jpg</span>
+            </div>
+          </div>
+          <div class="intro-bio" data-reveal="flip" data-search="刘瑞洋 简介 自我介绍 关于我 联系 邮箱 写信 研究方向">
+            <p>
+              I'm Ruiyang LIU, an M.Sc. student in Computer Control and Automation at
+              <a href="https://www.ntu.edu.sg/" class="link">Nanyang Technological University</a>,
+              advised by <a href="https://dr.ntu.edu.sg/entities/person/Xie-Lihua" class="link">Prof. Lihua XIE</a>.
+            </p>
+            <p>
+              Before NTU, I spent three years as a navigation algorithm engineer at
+              <a href="https://www.keenon.com/en" class="link">KEENON Robotics</a>,
+              building navigation systems for commercial service robots.
+              I received my B.Eng. in Robotic Engineering from
+              <a href="https://www.neu.edu.cn/" class="link">Northeastern University</a>, China.
+              My research focuses on aerial manipulation, whole-body motion planning, and multi-UAV navigation.
+              Feel free to reach out!
+            </p>
+            <div class="contact-list">
+              <!-- 点击后打开邮件程序写信。完整地址由脚本拼出来，网页源代码里不出现，防止被爬虫抓取 -->
+              <a class="email-pill mono" data-email-user="rliu017" data-email-domain="e.ntu.edu.sg" title="Send me an email">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5 12 13l8.5-6.5"/></svg>
+                rliu017 <span class="at">[at]</span> e.ntu.edu.sg
+              </a>
+              <a class="btn magnetic" href="https://github.com/RuiyangLiu-debug">GitHub</a>
+              <!-- 有了以后取消下面两行的注释（删掉 <!- - 和 - ->）：
+              <a class="btn magnetic" href="https://scholar.google.com/citations?user=XXXX">Google Scholar</a>
+              <a class="btn magnetic" href="files/cv.pdf">CV</a>
+              -->
+            </div>
+          </div>
+        </div>
+
+        <div class="research-head">
+          <h2 class="label">Recent research</h2>
+          <a href="#publications" class="link-arrow">All publications <span class="arr" aria-hidden="true">→</span></a>
+        </div>
+
+        <!-- 研究卡片墙：点卡片跳到对应的详细介绍 -->
+        <div class="bento" id="bento">
+          <a class="tile tile-big" href="#quadhand" data-cats="am" data-tilt style="--i:0">
+            <video src="images/research/r-quadhand.mp4" poster="images/research/r-quadhand.jpg" muted loop playsinline preload="metadata" data-autoplay></video>
+            <span class="tile-go">Featured ↓</span>
+            <span class="tile-meta">
+              <span class="tile-venue">IROS 2026</span>
+              <span class="tile-title">QuadHand</span>
+              <span class="tile-desc">Compact aerial manipulator with whole-body motion planning</span>
+            </span>
+          </a>
+          <a class="tile" href="#pub-sketch" data-cats="nav" data-tilt style="--i:1">
+            <video src="images/research/r-swarm.mp4" poster="images/research/r-swarm.jpg" muted loop playsinline preload="metadata" data-autoplay></video>
+            <span class="tile-go">Details ↓</span>
+            <span class="tile-meta">
+              <span class="tile-venue">ICARCV 2026</span>
+              <span class="tile-title">Sketch-to-Trajectories</span>
+              <span class="tile-desc">Indoor UAV swarm navigation with sketch-map priors</span>
+            </span>
+          </a>
+          <a class="tile" href="#pub-ductam" data-cats="am" data-tilt style="--i:2">
+            <video src="images/research/r-ductam.mp4" poster="images/research/r-ductam.jpg" muted loop playsinline preload="metadata" data-autoplay></video>
+            <span class="tile-go">Details ↓</span>
+            <span class="tile-meta">
+              <span class="tile-venue">IROS 2026</span>
+              <span class="tile-title">DuctAM</span>
+              <span class="tile-desc">High-force push-and-pull aerial manipulation</span>
+            </span>
+          </a>
+          <a class="tile" href="#pub-vla" data-cats="am rl" data-tilt style="--i:3">
+            <video src="images/research/r-vla.mp4" poster="images/research/r-vla-video.jpg" muted loop playsinline preload="metadata" data-autoplay></video>
+            <span class="tile-go">Details ↓</span>
+            <span class="tile-meta">
+              <span class="tile-venue">ICRA 2027 · Submitted</span>
+              <span class="tile-title">Scene-scale VLA</span>
+              <span class="tile-desc">Whole-body VLA skills chained across sites</span>
+            </span>
+          </a>
+          <a class="tile" href="#pub-rl" data-cats="am rl" data-tilt style="--i:4">
+            <video src="images/research/r-rl.mp4" poster="images/research/r-rl-video.jpg" muted loop playsinline preload="metadata" data-autoplay></video>
+            <span class="tile-go">Details ↓</span>
+            <span class="tile-meta">
+              <span class="tile-venue">ICRA 2027 · Submitted</span>
+              <span class="tile-title">Recurrent visual policy</span>
+              <span class="tile-desc">Whole-body aerial grasping and lifting</span>
+            </span>
+          </a>
+        </div>
+
+        <!-- 研究分类：点击后无人机飞过去，并高亮对应的研究卡片（不跳转） -->
+        <div class="chips" role="group" aria-label="Research topics">
+          <svg class="chip-drone" aria-hidden="true"><use href="#i-drone"/></svg>
+          <button class="chip is-active" type="button" data-filter="all">All</button>
+          <button class="chip" type="button" data-filter="am">Aerial manipulation</button>
+          <button class="chip" type="button" data-filter="nav">Multi-UAV navigation</button>
+          <button class="chip" type="button" data-filter="rl">Robot learning</button>
+        </div>
+        <p class="chips-hint">Pick a topic to highlight related work.</p>
+      </div>
+    </section>
+
+    <!-- ========== 重点工作：QuadHand ========== -->
+    <section id="quadhand" class="section featured">
+      <div class="container">
+        <div class="section-head" data-reveal="head">
+          <span class="section-num">01</span>
+          <h2 class="section-title"><span class="line"><span>Featured: QuadHand</span></span></h2>
+        </div>
+
+        <div class="feat-intro" data-search="四旋翼 空中机械臂 无人机 机械臂 全身运动规划 论文 视频 海报">
+          <div class="feat-text" data-reveal="flip">
+            <div class="badges"><span class="badge badge-accent">IROS 2026</span></div>
+            <h3 class="feat-title">QuadHand: A Compact Quadrotor Aerial Manipulator with MRC-SDF-Based Whole-Body Motion Planning</h3>
+            <p class="authors">Rui Jin*, <strong>Ruiyang Liu*</strong>, Xinhang Xu, Haotian Jin, Yi Wang, Yizhuo Yang, Lihua Xie</p>
+            <p class="feat-summary">
+              A compact quadrotor with a 3-DoF arm and gripper that plans the drone and the arm together.
+              Link-wise signed distance fields keep fine geometry for close-range contact,
+              and a whole-body trajectory optimizer produces safe, executable motions.
+            </p>
+            <div class="btn-row">
+              <a class="btn btn-primary magnetic" href="https://arxiv.org/abs/2609.35094">Paper</a>
+              <a class="btn magnetic" href="images/research/quadhand-video.mp4" data-video-open data-video-poster="images/research/quadhand-video.jpg">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>Watch video
+              </a>
+              <a class="btn magnetic" href="papers/quadhand-iros2026-poster.pdf">Poster</a>
+            </div>
+          </div>
+          <figure class="feat-photo" data-reveal="wipe">
+            <img src="images/research/quadhand-hero.jpg" alt="The QuadHand aerial manipulator in flight" data-parallax>
+          </figure>
+        </div>
+
+        <!-- 实验视频：几段代表性实验 -->
+        <div class="exp-grid" data-stagger>
+          <figure class="media" data-reveal="flip" data-search="救援 营救 无人机 实验"><video src="images/research/exp-rescue.mp4" poster="images/research/exp-rescue.jpg" muted loop playsinline preload="none" data-autoplay></video><figcaption>Drone rescue</figcaption></figure>
+          <figure class="media" data-reveal="flip" data-search="拔线 线缆 插头 实验"><video src="images/research/exp-cable.mp4" poster="images/research/exp-cable.jpg" muted loop playsinline preload="none" data-autoplay></video><figcaption>Cable unplugging</figcaption></figure>
+          <figure class="media" data-reveal="flip" data-search="穿越 窄缝 抓取 杯子 实验"><video src="images/research/r-quadhand.mp4" poster="images/research/r-quadhand.jpg" muted loop playsinline preload="none" data-autoplay></video><figcaption>Gap-crossing grasp</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 论文 ==========
+         点论文标题（或 Demo 按钮）会在下方展开演示视频 images/research/demo-*.mp4
+         每篇论文的 data-cats 是它所属的分类：am = 空中机械臂，nav = 多无人机导航，rl = 机器人学习，first = 一作或共同一作 -->
+    <section id="publications" class="section">
+      <div class="container">
+        <div class="section-head" data-reveal="head">
+          <span class="section-num">02</span>
+          <h2 class="section-title"><span class="line"><span>Publications</span></span></h2>
+        </div>
+
+        <div class="filter-bar" role="group" aria-label="Filter publications">
+          <button class="filter is-active" type="button" data-filter="all">All</button>
+          <button class="filter" type="button" data-filter="am">Aerial manipulation</button>
+          <button class="filter" type="button" data-filter="nav">Multi-UAV navigation</button>
+          <button class="filter" type="button" data-filter="rl">Robot learning</button>
+          <button class="filter" type="button" data-filter="first">First / co-first author</button>
+          <span class="filter-indicator" aria-hidden="true"></span>
+        </div>
+
+        <div class="pub-list">
+          <article class="pub" id="pub-vla" data-cats="am rl" data-search="视觉语言动作 大模型 场景 空中操作 机器人学习 投稿">
+            <div class="pub-collapse"><div class="pub-body">
+              <a class="pub-thumb" href="https://arxiv.org/abs/2609.39670"><video src="images/research/r-vla.mp4" poster="images/research/r-vla-video.jpg" muted loop playsinline preload="none" data-autoplay></video></a>
+              <div class="pub-text">
+                <div class="pub-venue"><span class="badge">ICRA 2027</span><span class="badge badge-soft">Submitted</span></div>
+                <h3 class="pub-title"><button class="pub-toggle" type="button" aria-expanded="false" aria-controls="demo-vla"><span>From Local Whole-Body VLA Behaviors to Scene-Scale Aerial Manipulation</span><svg class="pub-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+                <p class="authors">Weixiang Guo*, Rui Jin*, Haotian Jin, Xinhang Xu, <strong>Ruiyang Liu</strong>, Haoran Zhao, Yi Wang, Weiqi Gai, Kun Cao, Lihua Xie</p>
+                <p class="pub-desc">Trains whole-body VLA policies on synthesized trajectories without physical demonstrations, then chains local skills into scene-scale missions with a relational scene graph.</p>
+                <div class="pub-links"><button class="pub-demo-link" type="button" aria-expanded="false" aria-controls="demo-vla">Demo <span class="arr" aria-hidden="true">▾</span></button><a href="https://arxiv.org/abs/2609.39670">arXiv <span class="arr" aria-hidden="true">↗</span></a></div>
+              </div>
+            </div>
+            <div class="pub-demo" id="demo-vla" role="region" aria-label="Demo video">
+              <div class="pub-demo-inner">
+                <div class="pub-demo-grid" style="--cols:3">
+                  <figure class="demo-item" style="--k:0">
+                    <div class="demo-video"><video src="images/research/demo-vla-1.mp4" poster="images/research/demo-vla-1.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Grasp the water bottle</strong><span>Once handoff tolerances are met, the local whole-body VLA takes over and grasps the bottle.</span></figcaption>
+                  </figure>
+                  <figure class="demo-item" style="--k:1">
+                    <div class="demo-video"><video src="images/research/demo-vla-2.mp4" poster="images/research/demo-vla-2.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Transfer to the next site</strong><span>Carrying the bottle, the aerial manipulator follows a scene-graph-guided path out of the lab and down the corridor.</span></figcaption>
+                  </figure>
+                  <figure class="demo-item" style="--k:2">
+                    <div class="demo-video"><video src="images/research/demo-vla-3.mp4" poster="images/research/demo-vla-3.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Water the plant</strong><span>At the watering handoff, the VLA tilts the bottle to water the plant.</span></figcaption>
+                  </figure>
+                </div>
+              </div>
+            </div>
+            </div>
+          </article>
+
+          <article class="pub" id="pub-rl" data-cats="am rl" data-search="强化学习 循环 视觉策略 空中抓取 提升 螺丝刀 机器人学习 投稿">
+            <div class="pub-collapse"><div class="pub-body">
+              <a class="pub-thumb" href="https://arxiv.org/abs/2610.00404"><video src="images/research/r-rl.mp4" poster="images/research/r-rl-video.jpg" muted loop playsinline preload="none" data-autoplay></video></a>
+              <div class="pub-text">
+                <div class="pub-venue"><span class="badge">ICRA 2027</span><span class="badge badge-soft">Submitted</span></div>
+                <h3 class="pub-title"><button class="pub-toggle" type="button" aria-expanded="false" aria-controls="demo-rl"><span>Whole-Body Aerial Grasping and Lifting via Partial Visual Observations</span><svg class="pub-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+                <p class="authors">Jiaye Jin*, Rui Jin*, Xinhang Xu, Haotian Jin, <strong>Ruiyang Liu</strong>, Yi Wang, Jiayan Zhao, Kun Cao, Lihua Xie</p>
+                <p class="pub-desc">A recurrent teacher–student policy that jointly commands flight, arm motion, and gripper closure for whole-body aerial grasping and lifting.</p>
+                <div class="pub-links"><button class="pub-demo-link" type="button" aria-expanded="false" aria-controls="demo-rl">Demo <span class="arr" aria-hidden="true">▾</span></button><a href="https://arxiv.org/abs/2610.00404">arXiv <span class="arr" aria-hidden="true">↗</span></a></div>
+              </div>
+            </div>
+            <div class="pub-demo" id="demo-rl" role="region" aria-label="Demo video">
+              <div class="pub-demo-inner">
+                <div class="pub-demo-grid" style="--cols:2">
+                  <figure class="demo-item" style="--k:0">
+                    <div class="demo-video"><video src="images/research/demo-rl-1.mp4" poster="images/research/demo-rl-1.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Critical-state curriculum</strong><span>Assisted resets are gradually removed until one policy completes approach, grasp, and lift.</span></figcaption>
+                  </figure>
+                  <figure class="demo-item" style="--k:1">
+                    <div class="demo-video"><video src="images/research/demo-rl-2.mp4" poster="images/research/demo-rl-2.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Visual student in simulation</strong><span>The recurrent visual student grasps a screwdriver through native contact and lifts it, succeeding in all 30 trials.</span></figcaption>
+                  </figure>
+                </div>
+              </div>
+            </div>
+            </div>
+          </article>
+
+          <article class="pub" id="pub-quadhand" data-cats="am first" data-search="四旋翼 空中机械臂 全身运动规划 一作 共一 first author">
+            <div class="pub-collapse"><div class="pub-body">
+              <a class="pub-thumb" href="#quadhand"><video src="images/research/r-quadhand.mp4" poster="images/research/r-quadhand.jpg" muted loop playsinline preload="none" data-autoplay></video></a>
+              <div class="pub-text">
+                <div class="pub-venue"><span class="badge badge-accent">IROS 2026</span></div>
+                <h3 class="pub-title"><button class="pub-toggle" type="button" aria-expanded="false" aria-controls="demo-quadhand"><span>QuadHand: A Compact Quadrotor Aerial Manipulator with MRC-SDF-Based Whole-Body Motion Planning</span><svg class="pub-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+                <p class="authors">Rui Jin*, <strong>Ruiyang Liu*</strong>, Xinhang Xu, Haotian Jin, Yi Wang, Yizhuo Yang, Lihua Xie</p>
+                <p class="pub-desc">Compact quadrotor aerial manipulator with link-wise MRC-SDF collision queries and whole-body trajectory optimization.</p>
+                <div class="pub-links">
+                  <button class="pub-demo-link" type="button" aria-expanded="false" aria-controls="demo-quadhand">Demo <span class="arr" aria-hidden="true">▾</span></button>
+                  <a href="https://arxiv.org/abs/2609.35094">arXiv <span class="arr" aria-hidden="true">↗</span></a>
+                  <a href="images/research/quadhand-video.mp4" data-video-open data-video-poster="images/research/quadhand-video.jpg">Video <span class="arr" aria-hidden="true">▶</span></a>
+                  <a href="papers/quadhand-iros2026-poster.pdf">Poster <span class="arr" aria-hidden="true">↗</span></a>
+                  <a href="#quadhand">Highlights <span class="arr" aria-hidden="true">↑</span></a>
+                </div>
+              </div>
+            </div>
+            <div class="pub-demo" id="demo-quadhand" role="region" aria-label="Demo video">
+              <div class="pub-demo-inner">
+                <div class="pub-demo-grid" style="--cols:3">
+                  <figure class="demo-item" style="--k:0">
+                    <div class="demo-video"><video src="images/research/demo-quadhand-1.mp4" poster="images/research/demo-quadhand-1.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Tool placement</strong><span>Places a pre-grasped tool at its target position while holding the gripper steady in hover.</span></figcaption>
+                  </figure>
+                  <figure class="demo-item" style="--k:1">
+                    <div class="demo-video"><video src="images/research/demo-quadhand-2.mp4" poster="images/research/demo-quadhand-2.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Seven consecutive gap crossings</strong><span>Crosses a 0.6 × 0.35 m gap seven times in a row from different initial states.</span></figcaption>
+                  </figure>
+                  <figure class="demo-item" style="--k:2">
+                    <div class="demo-video"><video src="images/research/demo-quadhand-3.mp4" poster="images/research/demo-quadhand-3.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Payload capacity test</strong><span>Lifts and holds a 1,063 g payload in flight.</span></figcaption>
+                  </figure>
+                </div>
+              </div>
+            </div>
+            </div>
+          </article>
+
+          <article class="pub" id="pub-ductam" data-cats="am" data-search="涵道 推拉 推车 空中机械臂">
+            <div class="pub-collapse"><div class="pub-body">
+              <a class="pub-thumb" href="https://arxiv.org/abs/2609.15861"><video src="images/research/r-ductam.mp4" poster="images/research/r-ductam.jpg" muted loop playsinline preload="none" data-autoplay></video></a>
+              <div class="pub-text">
+                <div class="pub-venue"><span class="badge badge-accent">IROS 2026</span></div>
+                <h3 class="pub-title"><button class="pub-toggle" type="button" aria-expanded="false" aria-controls="demo-ductam"><span>DuctAM: A Duct-Assisted Quadrotor-Based Aerial Manipulator Enabling High-Force Push-and-Pull Interactions</span><svg class="pub-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+                <p class="authors">Yi Wang*, Rui Jin*, Xinhang Xu*, Haotian Jin, <strong>Ruiyang Liu</strong>, Yizhuo Yang, Lihua Xie</p>
+                <p class="pub-desc">Two ducted fans along the interaction axis deliver strong horizontal force for pushing and pulling, without large attitude changes.</p>
+                <div class="pub-links"><button class="pub-demo-link" type="button" aria-expanded="false" aria-controls="demo-ductam">Demo <span class="arr" aria-hidden="true">▾</span></button><a href="https://arxiv.org/abs/2609.15861">arXiv <span class="arr" aria-hidden="true">↗</span></a></div>
+              </div>
+            </div>
+            <div class="pub-demo" id="demo-ductam" role="region" aria-label="Demo video">
+              <div class="pub-demo-inner">
+                <div class="pub-demo-grid" style="--cols:3">
+                  <figure class="demo-item" style="--k:0">
+                    <div class="demo-video"><video src="images/research/demo-ductam-1.mp4" poster="images/research/demo-ductam-1.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Cart pushing</strong><span>Pushes a cart carrying a 3.87 kg payload while keeping stable flight.</span></figcaption>
+                  </figure>
+                  <figure class="demo-item" style="--k:1">
+                    <div class="demo-video"><video src="images/research/demo-ductam-2.mp4" poster="images/research/demo-ductam-2.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Door closing</strong><span>Closes the door of a flight case with horizontal force from the ducted fans.</span></figcaption>
+                  </figure>
+                  <figure class="demo-item" style="--k:2">
+                    <div class="demo-video"><video src="images/research/demo-ductam-3.mp4" poster="images/research/demo-ductam-3.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Drawer pulling</strong><span>Pulls a drawer open without large attitude changes.</span></figcaption>
+                  </figure>
+                </div>
+              </div>
+            </div>
+            </div>
+          </article>
+
+          <article class="pub" id="pub-sketch" data-cats="nav first" data-search="集群 多无人机 室内导航 草图 先验 平面图 初始定位 区域识别 一作 共一 first author">
+            <div class="pub-collapse"><div class="pub-body">
+              <a class="pub-thumb" href="https://arxiv.org/abs/2607.11386"><video src="images/research/r-swarm.mp4" poster="images/research/r-swarm.jpg" muted loop playsinline preload="none" data-autoplay></video></a>
+              <div class="pub-text">
+                <div class="pub-venue"><span class="badge badge-accent">ICARCV 2026</span></div>
+                <h3 class="pub-title"><button class="pub-toggle" type="button" aria-expanded="false" aria-controls="demo-swarm"><span>From Sketch Prior to Trajectories: A Mission-Oriented Coordinated Navigation Framework for Indoor UAV Swarm</span><svg class="pub-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+                <p class="authors">Xinhang Xu*, <strong>Ruiyang Liu*</strong>, Haotian Jin*, Yi Wang, Hongming Shen, Jianping Li, Lihua Xie</p>
+                <p class="pub-desc">Aligns sketch-map priors such as floor plans with onboard observations to coordinate indoor UAV swarms, including under communication loss.</p>
+                <div class="pub-links"><button class="pub-demo-link" type="button" aria-expanded="false" aria-controls="demo-swarm">Demo <span class="arr" aria-hidden="true">▾</span></button><a href="https://arxiv.org/abs/2607.11386">arXiv <span class="arr" aria-hidden="true">↗</span></a></div>
+              </div>
+            </div>
+            <div class="pub-demo" id="demo-swarm" role="region" aria-label="Demo video">
+              <div class="pub-demo-inner">
+                <div class="pub-demo-grid" style="--cols:3">
+                  <figure class="demo-item" style="--k:0">
+                    <div class="demo-video"><video src="images/research/demo-swarm-1.mp4" poster="images/research/demo-swarm-1.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Real-world flight</strong><span>UAVs navigate a multi-room indoor arena with obstacles.</span></figcaption>
+                  </figure>
+                  <figure class="demo-item" style="--k:1">
+                    <div class="demo-video"><video src="images/research/demo-swarm-2.mp4" poster="images/research/demo-swarm-2.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Initial localization</strong><span>The onboard LiDAR scan is snapped onto the sketch-prior map: a coarse SE(2) estimate is refined with GICP.</span></figcaption>
+                  </figure>
+                  <figure class="demo-item" style="--k:2">
+                    <div class="demo-video"><video src="images/research/demo-swarm-3.mp4" poster="images/research/demo-swarm-3.jpg" muted loop playsinline preload="none"></video></div>
+                    <figcaption><strong>Region detection</strong><span>2D ICP matches the onboard point cloud to sketch-map regions, locating each room and its exits even with an inexact prior.</span></figcaption>
+                  </figure>
+                </div>
+              </div>
+            </div>
+            </div>
+          </article>
+        </div>
+        <p class="pub-note">* Equal contribution</p>
+      </div>
+    </section>
+
+    <!-- ========== 项目 ==========
+         新增一个项目：复制一整段 <article class="project"> … </article> -->
+    <section id="projects" class="section">
+      <div class="container">
+        <div class="section-head" data-reveal="head">
+          <span class="section-num">03</span>
+          <h2 class="section-title"><span class="line"><span>Projects</span></span></h2>
+        </div>
+
+        <article class="project" data-reveal="flip" data-search="智能车 全国冠军 竞赛 比赛 物流 航天 红绿灯 车道 导航 项目">
+          <div class="project-heading">
+            <h3 class="project-title">Aerospace Smart Logistics Car</h3>
+            <span class="project-date">Oct 2020 – Sep 2021</span>
+          </div>
+          <div class="badges"><span class="badge badge-accent">National Champion</span><span class="badge">16th National College Student Smart Car Competition</span></div>
+          <p class="project-desc">
+            Our team won the national championship, ranking 1st among 52 finalist teams.
+            The car received dispatch commands and completed loading, transport, and unloading
+            while handling traffic lights, S-shaped roads, speed bumps, and obstacles,
+            integrating SLAM, path planning, lane and traffic-light perception, and task scheduling.
+          </p>
+          <div class="media-row">
+            <figure class="media"><video src="images/projects/smartcar-traffic-light.mp4" poster="images/projects/smartcar-traffic-light.jpg" muted loop playsinline preload="none" data-autoplay></video><figcaption>Traffic light passing</figcaption></figure>
+            <figure class="media"><video src="images/projects/smartcar-lane-following.mp4" poster="images/projects/smartcar-lane-following.jpg" muted loop playsinline preload="none" data-autoplay></video><figcaption>Lane following</figcaption></figure>
+            <figure class="media"><video src="images/projects/smartcar-navigation.mp4" poster="images/projects/smartcar-navigation.jpg" muted loop playsinline preload="none" data-autoplay></video><figcaption>Navigation and path tracking</figcaption></figure>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ========== 经历轨迹 ==========
+         往下滚动时，轨迹线一段段画出来，经过的航点会点亮
+         新增一条经历：复制一整段 <article class="j-item"> … </article> -->
+    <section id="journey" class="section">
+      <div class="container">
+        <div class="section-head" data-reveal="head">
+          <span class="section-num">04</span>
+          <h2 class="section-title"><span class="line"><span>Journey</span></span></h2>
+        </div>
+
+        <div class="journey">
+          <div class="journey-list">
+            <svg class="journey-svg" aria-hidden="true"><path class="track"/><path class="trail"/></svg>
+            <svg class="journey-drone" aria-hidden="true"><use href="#i-drone"/></svg>
+
+            <article class="j-item j-sub" data-search="同济 访问 访问研究 操锟">
+              <div class="j-node"><img src="images/logo/tongji.png" alt="Tongji University logo"></div>
+              <div class="j-card">
+                <span class="j-date">During M.Sc.</span>
+                <h4>Visiting Research</h4>
+                <div class="j-org">Tongji University</div>
+                <div class="j-note">Hosted by <a href="https://ntu-caokun.github.io/" class="link">Prof. Kun Cao</a></div>
+              </div>
+            </article>
+
+            <article class="j-item" data-search="南洋理工 硕士 谢立华 新加坡">
+              <div class="j-node"><img src="images/logo/ntu.png" alt="Nanyang Technological University logo"></div>
+              <div class="j-card">
+                <span class="j-date">2025 – Present</span>
+                <h4>M.Sc. in Computer Control and Automation</h4>
+                <div class="j-org">Nanyang Technological University, Singapore</div>
+                <div class="j-note">Supervised by <a href="https://dr.ntu.edu.sg/entities/person/Xie-Lihua" class="link">Prof. Lihua Xie</a></div>
+              </div>
+            </article>
+
+            <article class="j-item" data-search="擎朗 导航算法工程师 工作 上海 服务机器人">
+              <div class="j-node"><img src="images/logo/keenon.png" alt="KEENON Robotics logo"></div>
+              <div class="j-card">
+                <span class="j-date">Jul 2022 – Jul 2025</span>
+                <h4>Navigation Algorithm Engineer</h4>
+                <div class="j-org"><a href="https://www.keenon.com/en" class="link">KEENON Robotics</a>, Shanghai</div>
+                <div class="j-note">Autonomous navigation for commercial delivery and cleaning robots</div>
+              </div>
+            </article>
+
+            <article class="j-item" data-search="东北大学 本科 机器人工程 沈阳">
+              <div class="j-node"><img src="images/logo/neu.png" alt="Northeastern University logo"></div>
+              <div class="j-card">
+                <span class="j-date">2018 – 2022</span>
+                <h4>B.Eng. in Robotic Engineering</h4>
+                <div class="j-org">Northeastern University, China</div>
+                <div class="j-note">Faculty of Robot Science and Engineering</div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========== 访问量（GoatCounter） ==========
+       数字从 https://ruiyangliu.goatcounter.com 读取（需要在 GoatCounter 后台打开
+       “Allow adding visitor counts on your website”）；读取失败时这一块不显示 -->
+  <section class="visitors" data-goatcounter-code="ruiyangliu" aria-label="Visitor statistics" hidden>
+    <div class="visitor-card" data-reveal="flip">
+      <h2 class="label">Visitors</h2>
+      <div class="visitor-stats">
+        <div class="visitor-stat">
+          <span class="visitor-num" data-gc-path="TOTAL">0</span>
+          <span class="visitor-cap">total page views</span>
+        </div>
+        <div class="visitor-stat">
+          <span class="visitor-num" data-gc-path="TOTAL" data-gc-start="month">0</span>
+          <span class="visitor-cap">past month</span>
+        </div>
+      </div>
+      <!-- 国家和地区：数据来自 data/visitor-locations.js -->
+      <div class="visitor-locations" hidden>
+        <div class="loc-head">
+          <h3 class="loc-title">Countries &amp; regions</h3>
+          <span class="loc-badge" hidden>Sample data · local preview only</span>
+        </div>
+        <ol class="loc-list"></ol>
+      </div>
+      <p class="visitor-note">Counted with GoatCounter · updates every few hours</p>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <span>© 2026 Ruiyang Liu</span><span class="sep">·</span><span>Last updated Oct 2026</span>
+  </footer>
+
+  <!-- 站内搜索（点导航栏放大镜，或按 Ctrl+K / “/” 打开） -->
+  <dialog class="search-modal" aria-label="Search this site">
+    <div class="search-box">
+      <div class="search-field">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+        <input type="search" id="search-input" placeholder="Search papers, projects, experience…" autocomplete="off" spellcheck="false"
+               role="combobox" aria-expanded="true" aria-controls="search-results" aria-autocomplete="list">
+        <button class="search-close" type="button" aria-label="Close search"><kbd>Esc</kbd></button>
+      </div>
+      <div class="search-body">
+        <ul id="search-results" class="search-results" role="listbox" aria-label="Search results"></ul>
+        <div class="search-empty"></div>
+      </div>
+      <div class="search-foot mono">
+        <span><kbd>↑</kbd><kbd>↓</kbd> select</span>
+        <span><kbd>Enter</kbd> open</span>
+        <span><kbd>Ctrl</kbd><kbd>K</kbd> search</span>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 完整视频弹窗：点任意 “Video” 链接时弹出，播放链接指向的视频 -->
+  <dialog class="video-modal" aria-label="Project video">
+    <button class="icon-btn modal-close" type="button" aria-label="Close video">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <video src="images/research/quadhand-video.mp4" poster="images/research/quadhand-video.jpg" controls playsinline preload="none"></video>
+  </dialog>
+
+  <!-- GoatCounter 访问统计（不使用 Cookie；你在本机打开时默认不计数） -->
+  <script data-goatcounter="https://ruiyangliu.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+
+</body>
+</html>
