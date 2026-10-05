@@ -8,7 +8,6 @@
   <meta name="description" content="Ruiyang Liu — aerial manipulation, whole-body motion planning, and multi-UAV navigation at Nanyang Technological University.">
   <meta name="keywords" content="Ruiyang Liu, 刘瑞洋, Robotics, Aerial Manipulation, QuadHand, NTU">
   <meta name="author" content="Ruiyang Liu">
-  <!-- 浅色/深色模式：手动切换过就用记住的选择，否则跟随系统。放在最前面，避免打开时闪一下 -->
   <script>
     (function () {
       var root = document.documentElement;
@@ -31,7 +30,6 @@
 </head>
 <body>
 
-  <!-- 图标：四旋翼无人机 -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-drone" viewBox="0 0 24 24">
       <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
@@ -43,10 +41,8 @@
     </symbol>
   </svg>
 
-  <!-- 滚动进度条 -->
   <div class="progress" aria-hidden="true"><span></span></div>
 
-  <!-- ========== 顶部导航栏 ========== -->
   <header class="site-nav">
     <div class="nav-inner">
       <a href="#research" class="brand" aria-label="Ruiyang Liu, back to top">
@@ -85,14 +81,11 @@
 
   <main>
 
-    <!-- ========== 首屏：姓名 + 自我介绍 + 最近的研究 ========== -->
     <section id="research" class="hero">
       <div class="container hero-inner">
 
         <div class="hero-head">
-          <!-- 名字描边动画：先用橙色线条描出名字，再填满颜色（由 js/main.js 生成） -->
           <h1 class="hero-title"><span class="title-text">Ruiyang Liu</span></h1>
-          <!-- 标题右边：一条无人机飞行轨迹 -->
           <svg class="hero-traj" viewBox="0 0 600 180" aria-hidden="true">
             <path class="hero-traj-track" d="M20 150 C 120 150, 150 62, 254 68 S 392 160, 474 112 S 556 30, 588 36"/>
             <path class="hero-traj-path" d="M20 150 C 120 150, 150 62, 254 68 S 392 160, 474 112 S 556 30, 588 36"/>
@@ -102,10 +95,8 @@
           </svg>
         </div>
 
-        <!-- 自我介绍：左边照片，右边简介 -->
         <div class="intro">
           <div class="intro-photo" data-reveal="wipe">
-            <!-- 把你的照片命名为 profile.jpg 放进 images/ 文件夹，这里就会自动显示 -->
             <img src="images/profile.jpg" alt="Photo of Ruiyang Liu" onerror="this.closest('.intro-photo').classList.add('photo-missing')">
             <div class="photo-placeholder" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
@@ -128,16 +119,11 @@
               Feel free to reach out!
             </p>
             <div class="contact-list">
-              <!-- 点击后打开邮件程序写信。完整地址由脚本拼出来，网页源代码里不出现，防止被爬虫抓取 -->
               <a class="email-pill mono" data-email-user="rliu017" data-email-domain="e.ntu.edu.sg" title="Send me an email">
                 <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5 12 13l8.5-6.5"/></svg>
                 rliu017 <span class="at">[at]</span> e.ntu.edu.sg
               </a>
               <a class="btn magnetic" href="https://github.com/RuiyangLiu-debug">GitHub</a>
-              <!-- 有了以后取消下面两行的注释（删掉 <!- - 和 - ->）：
-              <a class="btn magnetic" href="https://scholar.google.com/citations?user=XXXX">Google Scholar</a>
-              <a class="btn magnetic" href="files/cv.pdf">CV</a>
-              -->
             </div>
           </div>
         </div>
@@ -147,7 +133,6 @@
           <a href="#publications" class="link-arrow">All publications <span class="arr" aria-hidden="true">→</span></a>
         </div>
 
-        <!-- 研究卡片墙：点卡片跳到对应的详细介绍 -->
         <div class="bento" id="bento">
           <a class="tile tile-big" href="#quadhand" data-cats="am" data-tilt style="--i:0">
             <video src="images/research/r-quadhand.mp4" poster="images/research/r-quadhand.jpg" muted loop playsinline preload="metadata" data-autoplay></video>
@@ -196,7 +181,6 @@
           </a>
         </div>
 
-        <!-- 研究分类：点击后无人机飞过去，并高亮对应的研究卡片（不跳转） -->
         <div class="chips" role="group" aria-label="Research topics">
           <svg class="chip-drone" aria-hidden="true"><use href="#i-drone"/></svg>
           <button class="chip is-active" type="button" data-filter="all">All</button>
@@ -208,7 +192,6 @@
       </div>
     </section>
 
-    <!-- ========== 重点工作：QuadHand ========== -->
     <section id="quadhand" class="section featured">
       <div class="container">
         <div class="section-head" data-reveal="head">
@@ -239,7 +222,6 @@
           </figure>
         </div>
 
-        <!-- 实验视频：几段代表性实验 -->
         <div class="exp-grid" data-stagger>
           <figure class="media" data-reveal="flip" data-search="救援 营救 无人机 实验"><video src="images/research/exp-rescue.mp4" poster="images/research/exp-rescue.jpg" muted loop playsinline preload="none" data-autoplay></video><figcaption>Drone rescue</figcaption></figure>
           <figure class="media" data-reveal="flip" data-search="拔线 线缆 插头 实验"><video src="images/research/exp-cable.mp4" poster="images/research/exp-cable.jpg" muted loop playsinline preload="none" data-autoplay></video><figcaption>Cable unplugging</figcaption></figure>
@@ -248,9 +230,6 @@
       </div>
     </section>
 
-    <!-- ========== 论文 ==========
-         点论文标题（或 Demo 按钮）会在下方展开演示视频 images/research/demo-*.mp4
-         每篇论文的 data-cats 是它所属的分类：am = 空中机械臂，nav = 多无人机导航，rl = 机器人学习，first = 一作或共同一作 -->
     <section id="publications" class="section">
       <div class="container">
         <div class="section-head" data-reveal="head">
@@ -434,8 +413,6 @@
       </div>
     </section>
 
-    <!-- ========== 项目 ==========
-         新增一个项目：复制一整段 <article class="project"> … </article> -->
     <section id="projects" class="section">
       <div class="container">
         <div class="section-head" data-reveal="head">
@@ -464,9 +441,6 @@
       </div>
     </section>
 
-    <!-- ========== 经历轨迹 ==========
-         往下滚动时，轨迹线一段段画出来，经过的航点会点亮
-         新增一条经历：复制一整段 <article class="j-item"> … </article> -->
     <section id="journey" class="section">
       <div class="container">
         <div class="section-head" data-reveal="head">
@@ -525,9 +499,6 @@
 
   </main>
 
-  <!-- ========== 访问量（GoatCounter） ==========
-       数字从 https://ruiyangliu.goatcounter.com 读取（需要在 GoatCounter 后台打开
-       “Allow adding visitor counts on your website”）；读取失败时这一块不显示 -->
   <section class="visitors" data-goatcounter-code="ruiyangliu" aria-label="Visitor statistics" hidden>
     <div class="visitor-card" data-reveal="flip">
       <h2 class="label">Visitors</h2>
@@ -541,7 +512,6 @@
           <span class="visitor-cap">past month</span>
         </div>
       </div>
-      <!-- 国家和地区：数据来自 data/visitor-locations.js -->
       <div class="visitor-locations" hidden>
         <div class="loc-head">
           <h3 class="loc-title">Countries &amp; regions</h3>
@@ -557,7 +527,6 @@
     <span>© 2026 Ruiyang Liu</span><span class="sep">·</span><span>Last updated Oct 2026</span>
   </footer>
 
-  <!-- 站内搜索（点导航栏放大镜，或按 Ctrl+K / “/” 打开） -->
   <dialog class="search-modal" aria-label="Search this site">
     <div class="search-box">
       <div class="search-field">
@@ -578,7 +547,6 @@
     </div>
   </dialog>
 
-  <!-- 完整视频弹窗：点任意 “Video” 链接时弹出，播放链接指向的视频 -->
   <dialog class="video-modal" aria-label="Project video">
     <button class="icon-btn modal-close" type="button" aria-label="Close video">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -586,7 +554,6 @@
     <video src="images/research/quadhand-video.mp4" poster="images/research/quadhand-video.jpg" controls playsinline preload="none"></video>
   </dialog>
 
-  <!-- GoatCounter 访问统计（不使用 Cookie；你在本机打开时默认不计数） -->
   <script data-goatcounter="https://ruiyangliu.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 
 </body>

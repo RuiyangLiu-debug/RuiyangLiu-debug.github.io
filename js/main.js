@@ -1,4 +1,3 @@
-// 网页动效与交互
 (() => {
   const root = document.documentElement;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -8,7 +7,6 @@
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
   const navHeight = () => $('.site-nav').offsetHeight;
 
-  // 滚动时要更新的东西都登记在这里，每帧最多跑一次
   const onScroll = [];
   let ticking = false;
   const runScroll = () => { ticking = false; onScroll.forEach((fn) => fn()); };
@@ -40,7 +38,6 @@
     runScroll();
   });
 
-  // ---------- 访问量卡片（GoatCounter）：读到数字才显示，滚动到这里时从 0 计数 ----------
   function initVisitors() {
     const box = $('.visitors');
     if (!box || !window.fetch) return;
@@ -56,8 +53,6 @@
         .then((d) => Number(String(d.count).replace(/[^\d]/g, '')) || 0);
     };
 
-    // 国家和地区：数据来自 data/visitor-locations.js（上线后由 GitHub 自动任务每天更新）
-    // 示例数据只在本机预览时显示，正式网站上自动隐藏
     const renderLocations = () => {
       const data = window.VISITOR_LOCATIONS;
       const wrap = $('.visitor-locations', box);
@@ -65,7 +60,6 @@
       const isLocal = location.protocol === 'file:' || /^(localhost|127\.|\[?::1\]?$)/.test(location.hostname);
       if (data.sample && !isLocal) return [];
       const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-      // 显示前 6 个，其余合并成 Others
       const sorted = [...data.items].sort((a, b) => b.count - a.count);
       const rows = sorted.slice(0, 6).map((x) => ({ code: x.code, name: x.name, count: x.count }));
       const others = (data.others || 0) + sorted.slice(6).reduce((s, x) => s + x.count, 0);
@@ -90,7 +84,6 @@
         box.hidden = false;
         const showFinal = () => nums.forEach((el) => { el.textContent = format(el.dataset.target); });
         if (reduceMotion || !('IntersectionObserver' in window)) { showFinal(); return; }
-        // 比例条先收起，和数字一起在滚动到这里时展开
         bars.forEach((b) => b.style.setProperty('--s', '0'));
         const io = new IntersectionObserver((entries) => {
           if (!entries.some((e) => e.isIntersecting)) return;
@@ -108,12 +101,10 @@
         io.observe(box);
       })
       .catch(() => {
-        // 读取失败（后台没打开计数设置、网络被拦截等）：卡片保持隐藏
       });
   }
 
-  // ---------- 论文演示视频：点论文标题（或 Demo 按钮）在下方展开，再点收起 ----------
-  const demoControls = new Map(); // 演示面板 → 开关函数（论文被筛选收起时一起收起视频）
+  const demoControls = new Map();
   function initPubDemos() {
     const panels = $$('.pub-demo');
     if (!panels.length) return;
@@ -124,7 +115,6 @@
       const toggles = $$(`[aria-controls="${panel.id}"]`);
       const isOpen = () => panel.classList.contains('is-open');
 
-      // 每段视频：展开且在屏幕上时循环播放，滚出屏幕时暂停（省流量、省电）
       if ('IntersectionObserver' in window) {
         const io = new IntersectionObserver((entries) => {
           entries.forEach((e) => {
@@ -140,7 +130,6 @@
       const setOpen = (open) => {
         panel.classList.toggle('is-open', open);
         toggles.forEach((t) => t.setAttribute('aria-expanded', String(open)));
-        // 左边的缩略图视频：展开时淡出隐藏并暂停，收起时淡入回来继续播放
         if (article) article.classList.toggle('demo-open', open);
         if (thumbVideo) {
           if (open) thumbVideo.pause();
@@ -148,7 +137,6 @@
         }
         if (open) {
           videos.forEach((v) => { v.preload = 'auto'; play(v); });
-          // 展开后底部如果在屏幕外，轻轻往下滚一点让视频完整露出来
           setTimeout(() => {
             const r = panel.getBoundingClientRect();
             const overflow = r.bottom - window.innerHeight + 16;
@@ -164,7 +152,6 @@
     });
   }
 
-  // ---------- 站内搜索：点放大镜，或按 Ctrl+K / “/” ----------
   function initSearch() {
     const dialog = $('.search-modal');
     const toggle = $('.search-toggle');
@@ -174,7 +161,6 @@
     const list = $('#search-results', dialog);
     const empty = $('.search-empty', dialog);
 
-    // Mac 上把快捷键提示换成 ⌘
     if (/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) {
       $$('.search-foot kbd', dialog).forEach((k) => { if (k.textContent === 'Ctrl') k.textContent = '⌘'; });
       toggle.title = 'Search (⌘K)';
@@ -182,13 +168,10 @@
 
     const norm = (s) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim();
     const text = (el) => (el ? el.textContent.replace(/\s+/g, ' ').trim() : '');
-    // 一组标签（如 IROS 2026、Submitted）之间用 · 隔开，避免文字粘在一起
     const tags = (el) => (el ? [...el.children].map(text).join(' · ') : '');
     const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-    // 建索引：从页面内容里读出来，以后改了网页文字，搜索会自动跟着变
-    // data-search 里是隐藏的中文关键词，只用于搜索
     const entries = [];
     const add = (type, title, body, el, target = el, flash = el) => {
       entries.push({ type, title, body, target, flash, t: norm(title), h: norm(`${title} ${body} ${el.dataset.search || ''}`) });
@@ -202,7 +185,6 @@
     $$('.project').forEach((p) => add('Project', text($('.project-title', p)), `${tags($('.badges', p))} · ${text($('.project-desc', p))} ${$$('figcaption', p).map(text).join(' · ')}`, p));
     $$('.j-item').forEach((j) => add('Journey', text($('h4', j)), `${text($('.j-date', j))} · ${text($('.j-org', j))} · ${text($('.j-note', j))}`, j, j, $('.j-card', j)));
 
-    // 匹配：每个词都要出现；出现在标题里的排得更靠前
     const search = (terms) => entries
       .map((e, i) => {
         if (!terms.every((t) => e.h.includes(t))) return null;
@@ -280,7 +262,6 @@
       if (!entry) return;
       dialog.close();
       let wait = 30;
-      // 目标论文被筛选收起了：先恢复显示全部，等展开动画结束再滚过去
       if (entry.target.classList.contains('pub') && entry.target.classList.contains('is-hidden')) {
         applyFilter('all');
         wait = reduceMotion ? 30 : 600;
@@ -313,7 +294,6 @@
       input.focus();
     });
 
-    // 快捷键：Ctrl+K / ⌘K，或在没有输入框获得焦点时按 “/”
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
@@ -328,8 +308,6 @@
     });
   }
 
-  // ---------- 邮箱：点击后打开邮件程序写信 ----------
-  // 完整地址只在这里拼出来，网页源代码里没有，减少被爬虫抓取
   function initEmail() {
     $$('[data-email-user]').forEach((a) => {
       const address = `${a.dataset.emailUser}@${a.dataset.emailDomain}`;
@@ -338,7 +316,6 @@
     });
   }
 
-  // ---------- 浅色/深色模式：没手动选过就跟随系统，点按钮后记住选择 ----------
   function initTheme() {
     const toggle = $('.theme-toggle');
     const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
@@ -361,8 +338,6 @@
     sync();
   }
 
-  // ---------- 首屏入场：标题逐行升起，研究卡片依次擦出 ----------
-  // 有启动页时，等名字描完、启动页开始淡出再入场
   let introStarted = false;
   const introCallbacks = [];
   const onIntro = (fn) => { if (introStarted) fn(); else introCallbacks.push(fn); };
@@ -374,13 +349,10 @@
   };
 
   function initIntro() {
-    // 先让浏览器算一次初始样式，再触发动画（不用 requestAnimationFrame，后台标签页里它会暂停）
     void document.body.offsetHeight;
     startIntro();
   }
 
-  // ---------- 名字描边：先用橙色线条描出 “Ruiyang Liu”，再填满颜色 ----------
-  // 在真实的标题文字上方叠一层同字体的 SVG 文字来画，画完后移除，留下原本的标题文字
   function initTitleDraw() {
     const h1 = $('.hero-title');
     const span = h1 && $('.title-text', h1);
@@ -391,7 +363,6 @@
       if (h1.classList.contains('title-done')) return;
       const cs = getComputedStyle(span);
       const text = span.textContent;
-      // 找到文字基线的位置，让 SVG 文字和真实文字重合
       const mark = document.createElement('span');
       mark.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
       span.appendChild(mark);
@@ -417,7 +388,7 @@
       t.style.setProperty('--dash', `${dash}`);
       svg.appendChild(t);
       span.appendChild(svg);
-      span.style.animation = 'none'; // 画的过程中真实文字保持透明
+      span.style.animation = 'none';
 
       let done = false;
       const finish = () => {
@@ -428,19 +399,17 @@
         svg.remove();
       };
       t.addEventListener('animationend', (e) => { if (e.animationName === 'title-fill') finish(); });
-      setTimeout(finish, 2800); // 保险：万一动画事件没触发
+      setTimeout(finish, 2800);
       void svg.getBoundingClientRect();
       svg.classList.add('is-drawing');
     };
 
-    // 等标题字体加载好再画（最多等 0.7 秒），否则描出来的字形会和最终文字对不上
     const fontReady = document.fonts && document.fonts.load
       ? Promise.race([document.fonts.load(`600 ${getComputedStyle(span).fontSize} "Space Grotesk"`), new Promise((r) => setTimeout(r, 700))])
       : Promise.resolve();
     fontReady.then(build, build);
   }
 
-  // ---------- 首屏右上角：轨迹线画出来，无人机沿着它飞 ----------
   function initHeroTrajectory() {
     const path = $('.hero-traj-path');
     const drone = $('.hero-drone');
@@ -458,7 +427,6 @@
     const duration = 2600;
     const delay = 700;
     const ease = (t) => 1 - Math.pow(1 - t, 3);
-    // 首屏入场开始后再飞
     onIntro(() => {
       const start = performance.now() + delay;
       const step = (now) => {
@@ -470,7 +438,6 @@
         else drone.classList.add('is-hovering');
       };
       requestAnimationFrame(step);
-      // 后台打开时 requestAnimationFrame 不会跑：切回来之前先直接画好
       if (document.hidden) {
         path.style.strokeDashoffset = '0';
         place(1);
@@ -479,7 +446,6 @@
     });
   }
 
-  // ---------- 导航栏：高亮当前板块，指示条滑过去 ----------
   function initNav() {
     const nav = $('.site-nav');
     const links = $$('.nav-links a');
@@ -506,7 +472,6 @@
     onScroll.push(update);
   }
 
-  // ---------- 顶部滚动进度条 ----------
   function initProgress() {
     const bar = $('.progress span');
     onScroll.push(() => {
@@ -515,24 +480,20 @@
     });
   }
 
-  // ---------- 视频：滚动到眼前才播放，离开就暂停（省流量） ----------
   function initVideos() {
     const videos = $$('video[data-autoplay]');
     if (reduceMotion) {
-      // 不自动播放，给视频加上播放按钮；放在链接里的视频（卡片、缩略图）只显示封面
       videos.forEach((v) => { if (!v.closest('a')) v.controls = true; });
       return;
     }
     const play = (v) => { const p = v.play(); if (p) p.catch(() => {}); };
     if (!('IntersectionObserver' in window)) { videos.forEach(play); return; }
     const io = new IntersectionObserver((entries) => {
-      // 论文展开演示视频时，被隐藏的缩略图不再自动播放
       entries.forEach((e) => { if (e.isIntersecting && !e.target.closest('.pub.demo-open')) play(e.target); else e.target.pause(); });
     }, { threshold: 0.2 });
     videos.forEach((v) => io.observe(v));
   }
 
-  // ---------- 研究卡片：跟着鼠标轻微倾斜 ----------
   function initTilt() {
     if (!finePointer || reduceMotion) return;
     $$('[data-tilt]').forEach((card) => {
@@ -546,7 +507,6 @@
     });
   }
 
-  // ---------- 按钮：鼠标靠近时被轻轻“吸”过去 ----------
   function initMagnetic() {
     if (!finePointer || reduceMotion) return;
     $$('.magnetic').forEach((btn) => {
@@ -560,9 +520,7 @@
     });
   }
 
-  // ---------- 滚动到某个元素，到达后让它闪一下 ----------
   function scrollToEl(el, flashEl = el) {
-    // 用布局位置（offsetTop）而不是屏幕位置：还没出现的元素带着入场动画的位移，屏幕位置会偏
     let y = 0;
     for (let n = el; n; n = n.offsetParent) y += n.offsetTop;
     const top = y - navHeight() - 16;
@@ -584,9 +542,6 @@
     }
   }
 
-  // ---------- 研究分类 ----------
-  // 首屏按钮：只在研究卡片墙上高亮对应卡片，不跳转、不影响论文列表
-  // 论文列表的筛选栏：只筛选论文
   let applyFilter = () => {};
   function initFilters() {
     const chips = $$('.chip');
@@ -615,7 +570,6 @@
 
     const matches = (el, cat) => cat === 'all' || el.dataset.cats.split(' ').includes(cat);
 
-    // 首屏：高亮研究卡片，无人机飞到选中的按钮上方
     const highlightTopic = (cat, hop = false) => {
       tiles.forEach((t) => t.classList.toggle('is-match', matches(t, cat)));
       bento.classList.toggle('is-filtered', cat !== 'all');
@@ -623,7 +577,6 @@
       moveDrone(chips.find((c) => c.dataset.filter === cat), hop);
     };
 
-    // 论文列表：收起不属于该分类的论文
     applyFilter = (cat) => {
       pubs.forEach((p) => {
         const hide = !matches(p, cat);
@@ -638,7 +591,6 @@
     chips.forEach((chip) => chip.addEventListener('click', () => highlightTopic(chip.dataset.filter, true)));
     filters.forEach((f) => f.addEventListener('click', () => {
       applyFilter(f.dataset.filter);
-      // 手机上筛选栏可以左右滑动：把点中的分类滑到看得见的位置
       const bar = f.parentElement;
       if (bar.scrollWidth > bar.clientWidth) {
         bar.scrollTo({ left: f.offsetLeft - (bar.clientWidth - f.offsetWidth) / 2, behavior: reduceMotion ? 'auto' : 'smooth' });
@@ -657,7 +609,6 @@
     });
   }
 
-  // ---------- 页内链接：平滑滚动 + 到达后闪一下 ----------
   function initAnchors() {
     document.addEventListener('click', (e) => {
       const a = e.target.closest('a[href^="#"]');
@@ -666,7 +617,6 @@
       if (!target) return;
       e.preventDefault();
       closeMobileMenu();
-      // 目标论文被筛选收起了：先恢复显示全部
       if (target.classList.contains('pub') && target.classList.contains('is-hidden')) applyFilter('all');
       const isSection = target.tagName === 'SECTION';
       scrollToEl(target, isSection ? (target.querySelector('.section-head') || target) : (target.querySelector('.pub-body') || target));
@@ -674,7 +624,6 @@
     });
   }
 
-  // ---------- 滚动出现：翻上来、擦出来、标题升起 ----------
   function initReveal() {
     $$('[data-stagger]').forEach((group) => {
       $$('[data-reveal]', group).forEach((el, i) => el.style.setProperty('--d', `${i * 0.08}s`));
@@ -684,8 +633,6 @@
       els.forEach((el) => el.classList.add('is-in'));
       return;
     }
-    // “擦出”的元素一开始被裁成宽度 0，浏览器会认为它不可见、永远不触发；
-    // 所以改为观察它的外层容器
     const targetOf = new Map();
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
@@ -702,7 +649,6 @@
     });
   }
 
-  // ---------- QuadHand 产品照：滚动时轻微视差 ----------
   function initParallax() {
     if (reduceMotion) return;
     const imgs = $$('[data-parallax]');
@@ -716,7 +662,6 @@
     });
   }
 
-  // ---------- 经历轨迹：随滚动画出飞行轨迹，无人机沿线飞，经过的航点点亮 ----------
   function initJourney() {
     const list = $('.journey-list');
     if (!list) return;
@@ -749,7 +694,6 @@
       trail.setAttribute('d', d);
       length = trail.getTotalLength();
       trail.style.strokeDasharray = `${length}`;
-      // 预先采样：每段长度对应的高度，滚动时用来查找“画到哪里”
       samples = [];
       for (let i = 0; i <= 240; i += 1) {
         const l = (length * i) / 240;
@@ -767,7 +711,6 @@
       }
       const rect = list.getBoundingClientRect();
       const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
-      // 判定线在屏幕 70% 高度处；滚到页面最底部时直接画完整条轨迹
       const focusY = atBottom ? Infinity : window.innerHeight * 0.7 - rect.top;
       let drawn = 0;
       for (const s of samples) { if (s.y <= focusY) drawn = s.l; else break; }
@@ -786,12 +729,10 @@
     window.addEventListener('load', build);
   }
 
-  // ---------- QuadHand 完整视频弹窗 ----------
   function initVideoModal() {
     const dialog = $('.video-modal');
-    if (!dialog || typeof dialog.showModal !== 'function') return; // 不支持弹窗时直接打开视频文件
+    if (!dialog || typeof dialog.showModal !== 'function') return;
     const video = $('video', dialog);
-    // 每个“Video”链接的 href 就是要播放的视频；封面图写在 data-video-poster 里
     $$('[data-video-open]').forEach((btn) => btn.addEventListener('click', (e) => {
       e.preventDefault();
       const src = btn.getAttribute('href');
@@ -809,7 +750,6 @@
     dialog.addEventListener('close', () => video.pause());
   }
 
-  // ---------- 手机菜单 ----------
   function closeMobileMenu() {
     const btn = $('.menu-toggle');
     const menu = $('#mobile-menu');
