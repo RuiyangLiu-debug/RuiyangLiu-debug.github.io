@@ -239,10 +239,10 @@
 
         <div class="filter-bar" role="group" aria-label="Filter publications">
           <button class="filter is-active" type="button" data-filter="all">All</button>
+          <button class="filter" type="button" data-filter="first">First / co-first author</button>
           <button class="filter" type="button" data-filter="am">Aerial manipulation</button>
           <button class="filter" type="button" data-filter="nav">Multi-UAV navigation</button>
           <button class="filter" type="button" data-filter="rl">Robot learning</button>
-          <button class="filter" type="button" data-filter="first">First / co-first author</button>
           <span class="filter-indicator" aria-hidden="true"></span>
         </div>
 
@@ -420,7 +420,7 @@
           <h2 class="section-title"><span class="line"><span>Projects</span></span></h2>
         </div>
 
-        <article class="project" data-reveal="flip" data-search="智能车 全国冠军 竞赛 比赛 物流 航天 红绿灯 车道 导航 项目">
+        <article class="project" data-reveal="flip" data-search="智能车 全国冠军 竞赛 比赛 物流 航天 红绿灯 车道 车道线检测 深度学习 U-Net 导航 项目">
           <div class="project-heading">
             <h3 class="project-title">Aerospace Smart Logistics Car</h3>
             <span class="project-date">Oct 2020 – Sep 2021</span>
@@ -430,11 +430,11 @@
             Our team won the national championship, ranking 1st among 52 finalist teams.
             The car received dispatch commands and completed loading, transport, and unloading
             while handling traffic lights, S-shaped roads, speed bumps, and obstacles,
-            integrating SLAM, path planning, lane and traffic-light perception, and task scheduling.
+            integrating SLAM, path planning, U-Net-based lane detection, traffic-light perception, and task scheduling.
           </p>
           <div class="media-row">
             <figure class="media"><video src="images/projects/smartcar-traffic-light.mp4" poster="images/projects/smartcar-traffic-light.jpg" muted loop playsinline preload="none" data-autoplay></video><figcaption>Traffic light passing</figcaption></figure>
-            <figure class="media"><video src="images/projects/smartcar-lane-following.mp4" poster="images/projects/smartcar-lane-following.jpg" muted loop playsinline preload="none" data-autoplay></video><figcaption>Lane following</figcaption></figure>
+            <figure class="media"><video src="images/projects/smartcar-lane-following.mp4" poster="images/projects/smartcar-lane-following.jpg" muted loop playsinline preload="none" data-autoplay></video><figcaption>Lane detection &amp; following (U-Net)</figcaption></figure>
             <figure class="media"><video src="images/projects/smartcar-navigation.mp4" poster="images/projects/smartcar-navigation.jpg" muted loop playsinline preload="none" data-autoplay></video><figcaption>Navigation and path tracking</figcaption></figure>
           </div>
         </article>
