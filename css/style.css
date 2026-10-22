@@ -830,6 +830,41 @@ a.email-pill[href]:hover .at { color: inherit; }
 .project-desc { margin: 0 0 18px; color: var(--muted); }
 .media-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 
+.cv {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: 40px;
+  align-items: center;
+  padding: 32px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.cv-title {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.cv-desc { margin: 0 0 14px; color: var(--muted); }
+.cv-meta { display: block; margin-bottom: 22px; font-size: 13px; color: var(--muted); }
+.cv-pages { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 6px; }
+.cv-pages img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 28px rgba(0, 0, 0, 0.1);
+  transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+}
+.cv-pages:hover img, .cv-pages:focus-visible img { box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 18px 40px rgba(0, 0, 0, 0.16); }
+.cv-pages:hover img:first-child, .cv-pages:focus-visible img:first-child { transform: translateY(-6px) rotate(-1.2deg); }
+.cv-pages:hover img:last-child, .cv-pages:focus-visible img:last-child { transform: translateY(-6px) rotate(1.2deg); }
+
 .journey { --rail: 104px; }
 .journey-list { position: relative; }
 .journey-svg {
@@ -1207,6 +1242,7 @@ kbd {
 
   .feat-intro { grid-template-columns: 1fr; gap: 28px; }
   .feat-photo { order: -1; }
+  .cv { grid-template-columns: 1fr; gap: 28px; }
 }
 
 @media (max-width: 640px) {
@@ -1236,6 +1272,8 @@ kbd {
   .pub-demo-grid { grid-template-columns: 1fr; gap: 20px; }
   .project { padding: 20px; }
   .project-heading { flex-direction: column; gap: 2px; }
+  .cv { padding: 20px; }
+  .cv-pages { gap: 10px; padding: 0; }
 
   .filter-bar {
     flex-wrap: nowrap;

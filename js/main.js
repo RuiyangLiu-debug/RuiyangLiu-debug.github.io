@@ -184,6 +184,8 @@
     $$('.pub').forEach((p) => add('Publication', text($('.pub-title', p)), `${tags($('.pub-venue', p))} · ${text($('.authors', p))} · ${text($('.pub-desc', p))}`, p, p, $('.pub-body', p)));
     $$('.project').forEach((p) => add('Project', text($('.project-title', p)), `${tags($('.badges', p))} · ${text($('.project-desc', p))} ${$$('figcaption', p).map(text).join(' · ')}`, p));
     $$('.j-item').forEach((j) => add('Journey', text($('h4', j)), `${text($('.j-date', j))} · ${text($('.j-org', j))} · ${text($('.j-note', j))}`, j, j, $('.j-card', j)));
+    const cv = $('.cv');
+    if (cv) add('CV', `${text($('.cv-title', cv))} (CV)`, `${text($('.cv-desc', cv))} · ${text($('.cv-meta', cv))}`, cv, $('#cv'), cv);
 
     const search = (terms) => entries
       .map((e, i) => {
