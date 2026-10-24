@@ -60,9 +60,17 @@
       const isLocal = location.protocol === 'file:' || /^(localhost|127\.|\[?::1\]?$)/.test(location.hostname);
       if (data.sample && !isLocal) return [];
       const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const names = { CN: 'China Mainland' };
+      const pinned = ['CN'];
+      const limit = 8;
       const sorted = [...data.items].sort((a, b) => b.count - a.count);
-      const rows = sorted.slice(0, 6).map((x) => ({ code: x.code, name: x.name, count: x.count }));
-      const others = (data.others || 0) + sorted.slice(6).reduce((s, x) => s + x.count, 0);
+      let shown = sorted.slice(0, limit);
+      pinned.forEach((c) => {
+        const item = sorted.find((x) => x.code === c);
+        if (item && !shown.includes(item)) shown = [...shown.slice(0, limit - 1), item].sort((a, b) => b.count - a.count);
+      });
+      const rows = shown.map((x) => ({ code: x.code, name: names[x.code] || x.name, count: x.count }));
+      const others = (data.others || 0) + sorted.filter((x) => !shown.includes(x)).reduce((s, x) => s + x.count, 0);
       if (others > 0) rows.push({ code: '··', name: 'Others', count: others, others: true });
       const max = Math.max(...rows.map((r) => r.count));
       $('.loc-list', wrap).innerHTML = rows.map((r, i) => `
